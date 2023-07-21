@@ -1,0 +1,45 @@
+version: "3.3"
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=inventory_db
+      - POSTGRES_USER=inventory_user
+      - POSTGRES_PASSWORD=G17Sh3yEOFhW5hne
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U inventory_user -d inventory_db
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  inventory-backend:
+    container_name: inventory-backend
+    image: inventory-backend:1.0.0
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "/wait"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=inventory_user
+      - DB_PASSWORD=G17Sh3yEOFhW5hne
+      - DB_NAME=inventory_db
+      - DB_PORT=5432
+      - APP_PORT=8000
+      - JWT_SECRET=5c4nt1ck3ts
+      - JWT_EXPIRES_IN=20m
+  inventory-frontend:
+    container_name: inventory-frontend
+    image: inventory-frontend:1.0.0
+    restart: unless-stopped
+  inventory-proxy:
+    container_name: inventory-proxy
+    image: inventory-proxy:1.0.0
+    restart: unless-stopped
+    ports:
+      - 443:443
+    depends_on:
+      - inventory-frontend
+      - inventory-backend
