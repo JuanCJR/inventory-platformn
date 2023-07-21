@@ -35,15 +35,15 @@ case $option in
 
     "start")
         echo "Inicializando app..."
-        docker-compose up -d   
+        docker compose up -d   
     ;;
     "stop")
         echo "Deteniendo app..."
-        docker-compose stop
+        docker compose stop
         ;;
     
     "status")
-        docker-compose ps
+        docker compose ps
         ;;
 
     "backup")
